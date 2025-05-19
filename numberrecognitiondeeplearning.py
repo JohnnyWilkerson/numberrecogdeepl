@@ -41,3 +41,59 @@ trueclasses = np.argmax(ytest, axis = 1)
 for i in range(5):
   print(f"Predicted : {predictions[i]}, True : {trueclasses[i]}" )
 
+from tkinter import *
+class Digitrecognizer:
+  def __init__(self,model):
+    self.model = model
+    self.root = Tk()
+    self.root.geometry('600x400')
+    self.root.title('Number Recognition')
+    self.root.config(bg='pink')
+
+    self.titl = Label(self.root, text='Drawing', font=('Courier New', 20, 'bold'), fg='black', bg='white')
+    self.titl.pack()
+
+    self.canvas1 = Canvas(self.root, width=300, height=200)
+    self.canvas1.config(bg='white')
+    self.canvas1.place(x=50, y=50)
+
+    self.canvas1.bind("<B1-Motion>", self.draw)
+
+    self.direct = Label(self.root, text='Draw a digit', font=('Courier New', 15, 'bold'), fg='brown')
+    self.direct.place(x = 400, y= 100)
+  
+
+    self.btn4=Button(self.root, text='Clear', command= self.clearcanvas)
+    self.btn4.place(x=50, y=300)
+
+    self.btn4=Button(self.root, text='Predict', command = self.predict)
+    self.btn4.place(x=200, y=300)
+
+    self.img = Image.new("L",(300, 200), color = "white")
+    self.drawing = ImageDraw.Draw(self.img)
+    self.root.mainloop()
+
+  def draw(self, event):
+    x, y = event.x, event.y
+    self.canvas1.create_oval(x-8,y-8, x+8, y+8, fill = "black", width =8)
+    self.drawing.ellipse([x-8,y-8, x+8, y+8], fill = "black")
+  
+  def clearcanvas(self):
+    self.canvas.delete("all")
+    self.img = Image.new("L",(300, 200), color = "white")
+    self.drawing = ImageDraw.Draw(self.img)
+  
+  def predict(self):
+    resized = np.array(self.img.resize((28, 28)))
+    resized = resized/255
+    resized = np.expand_dims(resized, axis = 0)
+    prediction = self.model.predict(resized)
+    digit = np.argmax(prediction)
+    self.direct.config(text = f"You drew a {digit}")
+  
+
+    
+
+
+app = Digitrecognizer(model)
+
